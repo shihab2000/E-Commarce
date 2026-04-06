@@ -122,3 +122,10 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATICFILES_DIRS=[STATIC_DIR]
 AUTH_USER_MODEL="accounts.CustomUser"
+
+EMAIL_BACKED="django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST="smtp.gmail.com"
+EMAIL_PORT=587
+EMAIL_USE_TIS=True
+EMAIL_HOST_USER="admin@gmail.com"
+EMAIL_HOST_PASSWORD="12341234"
