@@ -19,6 +19,7 @@ def user_signup(request):
     else:
         return render(request,'accounts/signup.html')
 
+
 def verify_email(request, uidb64, token):
     try:
         uid = urlsafe_base64_decode(uidb64).decode()
@@ -57,3 +58,50 @@ def user_login(request):
 def user_logout(request):
     logout(request)
     return redirect("signup")
+
+def reset_password(request):
+    if request.method == "POST":
+        email = request.POST.get("email")
+        try:
+            user = CustomUser.objects.get(email=email)
+        except CustomUser.DoesNotExist:
+            messages.error(request, "User does not exist.")
+            return redirect("password-reset")
+
+        send_password_reset_email(request, user)
+        messages.info(
+            request, "We have sent you an email with password reset instructions"
+        )
+        return redirect("login")
+
+    return render(request, "accounts/forgot.html")
+
+
+def reset_password_confirm(request, uidb64, token):
+    try:
+        uid = urlsafe_base64_decode(uidb64).decode()
+        user = CustomUser.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, CustomUser.DoesNotExist):
+        user = None
+
+    if user and default_token_generator.check_token(user, token):
+        user.is_verified = True
+        user.save()
+        login(request, user)
+        return redirect("new-password")
+    else:
+        messages.error(request, "The verification link is invalid or has expired.")
+        return redirect("login")
+
+
+@login_required
+def set_new_password(request):
+    if request.method == "POST":
+        # TODO: use form, and add 'Confirm Password'
+        password = request.POST.get("password")
+        user = request.user
+        user.set_password(password)
+        user.save()
+        messages.success(request, "Password updated successfully.")
+        return redirect("profile")
+    return render(request, "accounts/new-password.html")
