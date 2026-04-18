@@ -105,3 +105,9 @@ def set_new_password(request):
         messages.success(request, "Password updated successfully.")
         return redirect("profile")
     return render(request, "accounts/new-password.html")
+
+def user_dashboard(request):
+    if request.method=="POST":
+        user=request.user
+        user.save()
+    return render(request,"accounts/profile.html")

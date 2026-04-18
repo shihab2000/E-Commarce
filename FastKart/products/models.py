@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.text import slugify
+from accounts.models import CustomUser
 # Create your models here.
 
 class TimeStampedModel(models.Model):
@@ -41,3 +42,29 @@ class Product(TimeStampedModel):
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)
         super().save(*args, **kwargs)
+
+class ProductImage(models.Model):
+    product = models.ForeignKey(
+        Product, related_name="images", on_delete=models.CASCADE
+    )
+    image = models.ImageField(upload_to="products/images")
+
+    def __str__(self):
+        return f"Image for {self.product.name}"
+
+
+class Review(TimeStampedModel):
+    product = models.ForeignKey(
+        Product, related_name="reviews", on_delete=models.CASCADE
+    )
+    user = models.ForeignKey(
+        CustomUser, related_name="reviews", on_delete=models.CASCADE
+    )
+
+    rating = models.FloatField()
+    review = models.TextField()
+
+    is_approved = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Review by {self.user.first_name} for {self.product.name}"

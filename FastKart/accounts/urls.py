@@ -14,4 +14,5 @@ urlpatterns = [
         name="password_reset_confirm",
     ),
     path("set-new-password/", views.set_new_password, name="new-password"),
+    path("profile/",views.user_dashboard,name="profile")
 ]
